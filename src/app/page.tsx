@@ -9,15 +9,15 @@ import DebtManagement from '@/components/DebtManagement';
 import { Toaster } from '@/components/ui/toaster';
 import Image from 'next/image';
 import {
-  Home,
+  Home as HomeIcon,
   Users,
   Package,
   ShoppingCart,
   Wallet,
 } from 'lucide-react';
 
-const navItems: { id: TabType; label: string; icon: typeof Home }[] = [
-  { id: 'dashboard', label: 'Beranda', icon: Home },
+const navItems: { id: TabType; label: string; icon: typeof HomeIcon }[] = [
+  { id: 'dashboard', label: 'Beranda', icon: HomeIcon },
   { id: 'pos', label: 'Transaksi', icon: ShoppingCart },
   { id: 'members', label: 'Anggota', icon: Users },
   { id: 'products', label: 'Produk', icon: Package },

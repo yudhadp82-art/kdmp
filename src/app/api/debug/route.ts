@@ -13,7 +13,7 @@ export async function GET() {
 
   // Try to initialize Firebase
   let firebaseStatus = 'NOT TESTED';
-  let firebaseError = null;
+  let firebaseError: string | null = null;
   
   try {
     const { db } = await import('@/lib/firebase');
