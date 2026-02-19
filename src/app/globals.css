@@ -155,3 +155,29 @@ button, [role="button"] {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+/* Fix for dialogs and sheets */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
+/* Ensure icons are visible */
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Dialog overlay fix */
+[data-state="open"] {
+  visibility: visible;
+}
+
+[data-state="closed"] {
+  visibility: hidden;
+}
+
+/* Ensure proper z-index for modals */
+[role="dialog"] {
+  z-index: 9999 !important;
+}
