@@ -1,5 +1,6 @@
 {
-  "buildCommand": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+  "buildCommand": "NODE_OPTIONS='--max-old-space-size=3000' next build --no-lint",
+  "installCommand": "npm install --legacy-peer-deps",
   "functions": {
     "src/app/api/**": {
       "memory": 3008
