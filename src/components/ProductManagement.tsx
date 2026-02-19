@@ -210,7 +210,7 @@ export default function ProductManagement() {
     } else if (stok < 10) {
       return <Badge className="bg-orange-100 text-orange-800">Stok Rendah</Badge>;
     }
-    return <Badge className="bg-green-100 text-green-800">Tersedia</Badge>;
+    return <Badge className="bg-red-100 text-red-800">Tersedia</Badge>;
   };
 
   const filteredProducts = products.filter((p) => {
@@ -237,7 +237,7 @@ export default function ProductManagement() {
             setEditId(null);
             setShowForm(true);
           }}
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-red-600 hover:bg-red-700"
         >
           <Plus className="h-4 w-4 mr-1" />
           Tambah
@@ -307,7 +307,7 @@ export default function ProductManagement() {
                       </div>
                       <h3 className="font-semibold">{product.nama}</h3>
                       <div className="flex items-center justify-between mt-2">
-                        <span className="font-bold text-green-600">
+                        <span className="font-bold text-red-600">
                           {formatCurrency(product.hargaJual)}
                         </span>
                         <span className="text-sm text-gray-500">
@@ -444,7 +444,7 @@ export default function ProductManagement() {
               <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-green-600 hover:bg-green-700">
+              <Button type="submit" className="bg-red-600 hover:bg-red-700">
                 {editId ? 'Simpan' : 'Tambah'}
               </Button>
             </DialogFooter>
@@ -483,8 +483,8 @@ export default function ProductManagement() {
           {selectedProduct && (
             <div className="space-y-4 mt-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
-                  <Package className="h-6 w-6 text-green-600" />
+                <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center">
+                  <Package className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{selectedProduct.kode}</p>
@@ -518,12 +518,12 @@ export default function ProductManagement() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-green-600">
+                <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <div className="flex items-center gap-2 text-red-600">
                     <DollarSign className="h-4 w-4" />
                     <span className="text-sm">Harga Jual</span>
                   </div>
-                  <span className="font-bold text-green-600">
+                  <span className="font-bold text-red-600">
                     {formatCurrency(selectedProduct.hargaJual)}
                   </span>
                 </div>

@@ -234,15 +234,15 @@ export default function DebtManagement() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-green-50 border-green-200">
+        <Card className="bg-red-50 border-green-200">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-green-100">
-                <Check className="h-5 w-5 text-green-600" />
+              <div className="p-2 rounded-full bg-red-100">
+                <Check className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <p className="text-xs text-green-600">Sudah Dibayar</p>
-                <p className="text-lg font-bold text-green-700">
+                <p className="text-xs text-red-600">Sudah Dibayar</p>
+                <p className="text-lg font-bold text-red-700">
                   {formatCurrency(debts.reduce((sum, d) => sum + d.jumlahBayar, 0))}
                 </p>
               </div>
@@ -306,7 +306,7 @@ export default function DebtManagement() {
                         className={
                           data.totalSisa > 0
                             ? 'bg-orange-100 text-orange-800'
-                            : 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
                         }
                       >
                         {data.totalSisa > 0 ? 'Belum Lunas' : 'Lunas'}
@@ -321,7 +321,7 @@ export default function DebtManagement() {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Sudah Bayar</span>
-                        <span className="text-green-600">{formatCurrency(data.totalBayar)}</span>
+                        <span className="text-red-600">{formatCurrency(data.totalBayar)}</span>
                       </div>
                       <Separator />
                       <div className="flex justify-between font-semibold">
@@ -342,7 +342,7 @@ export default function DebtManagement() {
                       {data.totalSisa > 0 && (
                         <Button
                           size="sm"
-                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          className="flex-1 bg-red-600 hover:bg-red-700"
                           onClick={() => handleOpenPayment(data.debts.find(d => d.sisaHutang > 0) || data.debts[0])}
                         >
                           <Plus className="h-4 w-4 mr-1" />
@@ -430,7 +430,7 @@ export default function DebtManagement() {
               Batal
             </Button>
             <Button
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-red-600 hover:bg-red-700"
               onClick={handleProcessPayment}
               disabled={isProcessing}
             >
@@ -470,7 +470,7 @@ export default function DebtManagement() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Sudah Bayar</span>
-                  <span className="text-green-600">{formatCurrency(selectedDebt.jumlahBayar)}</span>
+                  <span className="text-red-600">{formatCurrency(selectedDebt.jumlahBayar)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold">
@@ -496,7 +496,7 @@ export default function DebtManagement() {
                           <CardContent className="p-3">
                             <div className="flex justify-between items-start">
                               <div>
-                                <p className="font-semibold text-green-600">
+                                <p className="font-semibold text-red-600">
                                   {formatCurrency(payment.jumlahBayar)}
                                 </p>
                                 <p className="text-xs text-gray-500">
@@ -508,7 +508,7 @@ export default function DebtManagement() {
                                   </p>
                                 )}
                               </div>
-                              <Check className="h-4 w-4 text-green-600" />
+                              <Check className="h-4 w-4 text-red-600" />
                             </div>
                           </CardContent>
                         </Card>
@@ -520,7 +520,7 @@ export default function DebtManagement() {
 
               {selectedDebt.sisaHutang > 0 && (
                 <Button
-                  className="w-full bg-green-600 hover:bg-green-700"
+                  className="w-full bg-red-600 hover:bg-red-700"
                   onClick={() => {
                     setShowDetailSheet(false);
                     setShowPaymentDialog(true);

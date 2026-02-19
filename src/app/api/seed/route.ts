@@ -42,6 +42,8 @@ export async function POST() {
       return NextResponse.json({
         success: false,
         message: 'Data sudah ada. Hapus data terlebih dahulu untuk melakukan seed ulang.',
+        existingMembers: membersSnapshot.docs.length,
+        existingProducts: productsSnapshot.docs.length,
       });
     }
 

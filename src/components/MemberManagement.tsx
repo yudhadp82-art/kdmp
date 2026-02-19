@@ -208,7 +208,7 @@ export default function MemberManagement() {
             setEditId(null);
             setShowForm(true);
           }}
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-red-600 hover:bg-red-700"
         >
           <Plus className="h-4 w-4 mr-1" />
           Tambah
@@ -265,7 +265,7 @@ export default function MemberManagement() {
                           variant={member.status === 'aktif' ? 'default' : 'secondary'}
                           className={
                             member.status === 'aktif'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-red-100 text-red-800'
                               : 'bg-gray-100 text-gray-800'
                           }
                         >
@@ -382,7 +382,7 @@ export default function MemberManagement() {
               <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="bg-green-600 hover:bg-green-700">
+              <Button type="submit" className="bg-red-600 hover:bg-red-700">
                 {editId ? 'Simpan' : 'Tambah'}
               </Button>
             </DialogFooter>
@@ -421,8 +421,8 @@ export default function MemberManagement() {
           {selectedMember && (
             <div className="space-y-4 mt-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                  <User className="h-6 w-6 text-green-600" />
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                  <User className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">{selectedMember.nama}</h3>
@@ -430,7 +430,7 @@ export default function MemberManagement() {
                     variant={selectedMember.status === 'aktif' ? 'default' : 'secondary'}
                     className={
                       selectedMember.status === 'aktif'
-                        ? 'bg-green-100 text-green-800'
+                        ? 'bg-red-100 text-red-800'
                         : 'bg-gray-100 text-gray-800'
                     }
                   >
