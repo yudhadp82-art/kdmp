@@ -6,7 +6,6 @@ import MemberManagement from '@/components/MemberManagement';
 import ProductManagement from '@/components/ProductManagement';
 import POS from '@/components/POS';
 import DebtManagement from '@/components/DebtManagement';
-import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
 import Image from 'next/image';
 import {
@@ -16,7 +15,6 @@ import {
   ShoppingCart,
   Wallet,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 
 const navItems: { id: TabType; label: string; icon: typeof Home }[] = [
   { id: 'dashboard', label: 'Beranda', icon: Home },
@@ -28,44 +26,6 @@ const navItems: { id: TabType; label: string; icon: typeof Home }[] = [
 
 export default function Home() {
   const { activeTab, setActiveTab } = useAppStore();
-  const [showSplash, setShowSplash] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleStart = () => {
-    setShowSplash(false);
-  };
-
-  // Splash screen
-  if (mounted && showSplash) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-600 to-red-800 flex flex-col items-center justify-center">
-        <div className="text-center text-white">
-          <div className="w-28 h-28 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl overflow-hidden">
-            <Image 
-              src="/logo.png" 
-              alt="KDMP Logo" 
-              width={100} 
-              height={100}
-              className="object-contain"
-              priority
-            />
-          </div>
-          <h1 className="text-3xl font-bold mb-2">KDMP Sindangjaya</h1>
-          <p className="text-red-100 text-lg">Sistem POS Koperasi</p>
-          <Button 
-            onClick={handleStart}
-            className="mt-6 bg-white text-red-600 hover:bg-red-50 font-semibold px-8"
-          >
-            Tap untuk mulai
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
