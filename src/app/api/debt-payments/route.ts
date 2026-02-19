@@ -1,18 +1,28 @@
 // Debt Payments API Route
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, getDocs, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/lib/firebase';
+import { db, COLLECTIONS } from '@/lib/firebase';
 import type { DebtPayment, Debt } from '@/types';
+
+// Helper to check DB connection
+function checkDb() {
+  if (!db) {
+    return { error: 'Firebase not configured. Please set environment variables.' };
+  }
+  return null;
+}
 
 // GET all debt payments
 export async function GET(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const memberId = searchParams.get('memberId');
     const debtId = searchParams.get('debtId');
 
-    const snapshot = await getDocs(collection(db, COLLECTIONS.DEBT_PAYMENTS));
+    const snapshot = await getDocs(collection(db!, COLLECTIONS.DEBT_PAYMENTS));
     
     let payments: DebtPayment[] = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -36,15 +46,15 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error fetching debt payments:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // POST create new debt payment
 export async function POST(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const body = await request.json();
     const { debtId, memberId, memberName, jumlahBayar, keterangan } = body;
@@ -52,14 +62,11 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString();
 
     // Get current debt
-    const debtRef = doc(db, COLLECTIONS.DEBTS, debtId);
+    const debtRef = doc(db!, COLLECTIONS.DEBTS, debtId);
     const debtDoc = await getDoc(debtRef);
     
     if (!debtDoc.exists()) {
-      return NextResponse.json(
-        { success: false, error: 'Debt not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'Debt not found' }, { status: 404 });
     }
 
     const debtData = debtDoc.data() as Debt;
@@ -79,7 +86,7 @@ export async function POST(request: NextRequest) {
       updatedAt: now,
     };
 
-    const docRef = await addDoc(collection(db, COLLECTIONS.DEBT_PAYMENTS), paymentData);
+    const docRef = await addDoc(collection(db!, COLLECTIONS.DEBT_PAYMENTS), paymentData);
     
     const newPayment: DebtPayment = {
       id: docRef.id,
@@ -98,9 +105,6 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error creating debt payment:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }

@@ -1,18 +1,28 @@
 // Debts API Route
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, getDocs, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/lib/firebase';
+import { collection, getDocs, updateDoc, doc, getDoc } from 'firebase/firestore';
+import { db, COLLECTIONS } from '@/lib/firebase';
 import type { Debt } from '@/types';
+
+// Helper to check DB connection
+function checkDb() {
+  if (!db) {
+    return { error: 'Firebase not configured. Please set environment variables.' };
+  }
+  return null;
+}
 
 // GET all debts
 export async function GET(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const memberId = searchParams.get('memberId');
     const status = searchParams.get('status');
 
-    const snapshot = await getDocs(collection(db, COLLECTIONS.DEBTS));
+    const snapshot = await getDocs(collection(db!, COLLECTIONS.DEBTS));
     
     let debts: Debt[] = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -36,27 +46,24 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error fetching debts:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // PUT update debt
 export async function PUT(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const body = await request.json();
     const { id, ...updateData } = body;
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
     }
 
-    const debtRef = doc(db, COLLECTIONS.DEBTS, id);
+    const debtRef = doc(db!, COLLECTIONS.DEBTS, id);
     await updateDoc(debtRef, {
       ...updateData,
       updatedAt: new Date().toISOString(),
@@ -69,9 +76,6 @@ export async function PUT(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error updating debt:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }

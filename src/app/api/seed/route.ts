@@ -1,8 +1,7 @@
 // Seed API Route - Generate sample data
 import { NextResponse } from 'next/server';
 import { collection, getDocs, addDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/lib/firebase';
+import { db, COLLECTIONS } from '@/lib/firebase';
 
 const sampleMembers = [
   { nama: 'Ahmad Hidayat', alamat: 'Jl. Merdeka No. 10, Sindangjaya', telepon: '081234567890', email: 'ahmad@email.com', status: 'aktif' },
@@ -31,6 +30,13 @@ const sampleProducts = [
 ];
 
 export async function POST() {
+  if (!db) {
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Firebase not configured. Please set environment variables.' 
+    }, { status: 500 });
+  }
+
   try {
     const now = new Date().toISOString();
 
@@ -73,9 +79,6 @@ export async function POST() {
   } catch (error: unknown) {
     console.error('Error seeding data:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }

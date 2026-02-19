@@ -1,9 +1,16 @@
 // Transactions API Route
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, getDocs, addDoc, doc, getDoc, updateDoc, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/lib/firebase';
+import { collection, getDocs, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db, COLLECTIONS } from '@/lib/firebase';
 import type { Transaction, Debt } from '@/types';
+
+// Helper to check DB connection
+function checkDb() {
+  if (!db) {
+    return { error: 'Firebase not configured. Please set environment variables.' };
+  }
+  return null;
+}
 
 // Generate transaction number
 function generateTransactionNumber(): string {
@@ -17,6 +24,9 @@ function generateTransactionNumber(): string {
 
 // GET all transactions
 export async function GET(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const memberId = searchParams.get('memberId');
@@ -24,7 +34,7 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get('endDate');
     const metode = searchParams.get('metode');
 
-    const snapshot = await getDocs(collection(db, COLLECTIONS.TRANSACTIONS));
+    const snapshot = await getDocs(collection(db!, COLLECTIONS.TRANSACTIONS));
     
     let transactions: Transaction[] = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -60,15 +70,15 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error fetching transactions:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // POST create new transaction
 export async function POST(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const body = await request.json();
     const { items, metodePembayaran, memberId, memberName, uangDiterima } = body;
@@ -92,7 +102,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Create transaction
-    const docRef = await addDoc(collection(db, COLLECTIONS.TRANSACTIONS), transactionData);
+    const docRef = await addDoc(collection(db!, COLLECTIONS.TRANSACTIONS), transactionData);
     
     const newTransaction: Transaction = {
       id: docRef.id,
@@ -101,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     // Update product stock
     for (const item of items) {
-      const productRef = doc(db, COLLECTIONS.PRODUCTS, item.productId);
+      const productRef = doc(db!, COLLECTIONS.PRODUCTS, item.productId);
       const productDoc = await getDoc(productRef);
       if (productDoc.exists()) {
         const currentStock = productDoc.data().stok || 0;
@@ -128,16 +138,13 @@ export async function POST(request: NextRequest) {
         updatedAt: now,
       };
 
-      await addDoc(collection(db, COLLECTIONS.DEBTS), debtData);
+      await addDoc(collection(db!, COLLECTIONS.DEBTS), debtData);
     }
 
     return NextResponse.json({ success: true, data: newTransaction });
   } catch (error: unknown) {
     console.error('Error creating transaction:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }

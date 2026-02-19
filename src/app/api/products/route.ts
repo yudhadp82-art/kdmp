@@ -1,19 +1,29 @@
 // Products API Route
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/lib/firebase';
+import { db, COLLECTIONS } from '@/lib/firebase';
 import type { Product } from '@/types';
+
+// Helper to check DB connection
+function checkDb() {
+  if (!db) {
+    return { error: 'Firebase not configured. Please set environment variables.' };
+  }
+  return null;
+}
 
 // GET all products
 export async function GET(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
     const search = searchParams.get('search');
     const lowStock = searchParams.get('lowStock');
 
-    const snapshot = await getDocs(collection(db, COLLECTIONS.PRODUCTS));
+    const snapshot = await getDocs(collection(db!, COLLECTIONS.PRODUCTS));
     
     let products: Product[] = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -47,15 +57,15 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error fetching products:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // POST create new product
 export async function POST(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const body = await request.json();
     const { kode, nama, kategori, hargaBeli, hargaJual, stok, satuan } = body;
@@ -73,7 +83,7 @@ export async function POST(request: NextRequest) {
       updatedAt: now,
     };
 
-    const docRef = await addDoc(collection(db, COLLECTIONS.PRODUCTS), productData);
+    const docRef = await addDoc(collection(db!, COLLECTIONS.PRODUCTS), productData);
     
     const newProduct: Product = {
       id: docRef.id,
@@ -84,29 +94,26 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error creating product:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // PUT update product
 export async function PUT(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const body = await request.json();
     const { id, ...updateData } = body;
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
     }
 
-    const productRef = doc(db, COLLECTIONS.PRODUCTS, id);
+    const productRef = doc(db!, COLLECTIONS.PRODUCTS, id);
     
-    const dataToUpdate = { ...updateData };
+    const dataToUpdate: Record<string, unknown> = { ...updateData };
     if (updateData.hargaBeli !== undefined) dataToUpdate.hargaBeli = Number(updateData.hargaBeli);
     if (updateData.hargaJual !== undefined) dataToUpdate.hargaJual = Number(updateData.hargaJual);
     if (updateData.stok !== undefined) dataToUpdate.stok = Number(updateData.stok);
@@ -121,35 +128,29 @@ export async function PUT(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error updating product:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // DELETE product
 export async function DELETE(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
     }
 
-    await deleteDoc(doc(db, COLLECTIONS.PRODUCTS, id));
+    await deleteDoc(doc(db!, COLLECTIONS.PRODUCTS, id));
 
     return NextResponse.json({ success: true, message: 'Product deleted successfully' });
   } catch (error: unknown) {
     console.error('Error deleting product:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }

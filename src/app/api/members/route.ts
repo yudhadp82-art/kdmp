@@ -1,19 +1,28 @@
 // Members API Route
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/lib/firebase';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc } from 'firebase/firestore';
+import { db, COLLECTIONS } from '@/lib/firebase';
 import type { Member } from '@/types';
+
+// Helper to check DB connection
+function checkDb() {
+  if (!db) {
+    return { error: 'Firebase not configured. Please set environment variables.' };
+  }
+  return null;
+}
 
 // GET all members
 export async function GET(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status');
     const search = searchParams.get('search');
 
-    let membersQuery = collection(db, COLLECTIONS.MEMBERS);
-    const snapshot = await getDocs(membersQuery);
+    const snapshot = await getDocs(collection(db!, COLLECTIONS.MEMBERS));
     
     let members: Member[] = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -43,15 +52,15 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error fetching members:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // POST create new member
 export async function POST(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const body = await request.json();
     const { nama, alamat, telepon, email, status } = body;
@@ -68,7 +77,7 @@ export async function POST(request: NextRequest) {
       updatedAt: now,
     };
 
-    const docRef = await addDoc(collection(db, COLLECTIONS.MEMBERS), memberData);
+    const docRef = await addDoc(collection(db!, COLLECTIONS.MEMBERS), memberData);
     
     const newMember: Member = {
       id: docRef.id,
@@ -79,27 +88,24 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error creating member:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // PUT update member
 export async function PUT(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const body = await request.json();
     const { id, ...updateData } = body;
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
     }
 
-    const memberRef = doc(db, COLLECTIONS.MEMBERS, id);
+    const memberRef = doc(db!, COLLECTIONS.MEMBERS, id);
     await updateDoc(memberRef, {
       ...updateData,
       updatedAt: new Date().toISOString(),
@@ -112,35 +118,29 @@ export async function PUT(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error updating member:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 
 // DELETE member
 export async function DELETE(request: NextRequest) {
+  const dbError = checkDb();
+  if (dbError) return NextResponse.json({ success: false, error: dbError.error }, { status: 500 });
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
     }
 
-    await deleteDoc(doc(db, COLLECTIONS.MEMBERS, id));
+    await deleteDoc(doc(db!, COLLECTIONS.MEMBERS, id));
 
     return NextResponse.json({ success: true, message: 'Member deleted successfully' });
   } catch (error: unknown) {
     console.error('Error deleting member:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }

@@ -1,12 +1,18 @@
 // Dashboard API Route
 import { NextResponse } from 'next/server';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/lib/firebase';
+import { db, COLLECTIONS } from '@/lib/firebase';
 import type { DashboardStats } from '@/types';
 
 // GET dashboard statistics
 export async function GET() {
+  if (!db) {
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Firebase not configured. Please set environment variables.' 
+    }, { status: 500 });
+  }
+
   try {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -58,9 +64,6 @@ export async function GET() {
   } catch (error: unknown) {
     console.error('Error fetching dashboard stats:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
