@@ -15,9 +15,8 @@ import {
   Package,
   ShoppingCart,
   Wallet,
-  FileText,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const navItems: { id: TabType; label: string; icon: typeof Home }[] = [
   { id: 'dashboard', label: 'Beranda', icon: Home },
@@ -30,15 +29,21 @@ const navItems: { id: TabType; label: string; icon: typeof Home }[] = [
 export default function Home() {
   const { activeTab, setActiveTab } = useAppStore();
   const [showSplash, setShowSplash] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleStart = () => {
+    setShowSplash(false);
+  };
 
   // Splash screen
-  if (showSplash) {
+  if (mounted && showSplash) {
     return (
-      <div 
-        className="min-h-screen bg-gradient-to-br from-red-600 to-red-800 flex flex-col items-center justify-center cursor-pointer"
-        onClick={() => setShowSplash(false)}
-      >
-        <div className="text-center text-white animate-fade-in">
+      <div className="min-h-screen bg-gradient-to-br from-red-600 to-red-800 flex flex-col items-center justify-center">
+        <div className="text-center text-white">
           <div className="w-28 h-28 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl overflow-hidden">
             <Image 
               src="/logo.png" 
@@ -46,11 +51,17 @@ export default function Home() {
               width={100} 
               height={100}
               className="object-contain"
+              priority
             />
           </div>
           <h1 className="text-3xl font-bold mb-2">KDMP Sindangjaya</h1>
           <p className="text-red-100 text-lg">Sistem POS Koperasi</p>
-          <p className="text-red-200 text-sm mt-4">Tap untuk mulai</p>
+          <Button 
+            onClick={handleStart}
+            className="mt-6 bg-white text-red-600 hover:bg-red-50 font-semibold px-8"
+          >
+            Tap untuk mulai
+          </Button>
         </div>
       </div>
     );
